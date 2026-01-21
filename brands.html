@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brands | Miranda</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: url('knife.png') 0 0, auto;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-primary);
+            font-family: var(--font-main);
+            height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Wavy Background */
+        .bg-wavy {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(20, 25, 35, 1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(15, 20, 30, 1) 0%, transparent 40%),
+                #050505;
+            z-index: -2;
+        }
+
+        .bg-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url("data:image/svg+xml,%3Csvg viewBox='0 0 1000 1000' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/feTurbulence%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Navigation Tab */
+        nav {
+            position: fixed;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 100px;
+            padding: 6px 16px 6px 6px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .nav-branding {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 300;
+            padding: 8px 16px;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover,
+        nav a.active {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Content Section */
+        .header-content {
+            padding: 40px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+
+        h2 {
+            font-size: 1.2rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .description {
+            font-size: 0.75rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            max-width: 400px;
+        }
+
+        .main-showcase {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Brands Grid */
+        .brands-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            max-width: 1200px;
+            width: 100%;
+            gap: 25px;
+            animation: fadeIn 1s ease-out;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .brands-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .brands-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .brand-card {
+            background: rgba(20, 24, 32, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+        }
+
+        .brand-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand-img-box {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .brand-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .brand-card:hover .brand-img {
+            transform: scale(1.05);
+        }
+
+        .brand-info {
+            padding: 20px;
+            text-align: center;
+            background: #12161f;
+        }
+
+        .brand-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .brand-desc {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        /* Music Player Pill */
+        #player-container {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
+        .player-pill {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            padding: 10px 20px 10px 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .player-pill:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .play-toggle {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--text-primary);
+            color: var(--bg);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .play-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .play-toggle svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .p-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .p-title-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .p-title {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .p-settings {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            font-size: 1rem;
+            line-height: 1;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .p-settings:hover {
+            color: var(--text-primary);
+        }
+
+        .p-input-container {
+            display: none;
+            position: absolute;
+            bottom: 60px;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 10px;
+            z-index: 101;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .p-input-container input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .p-visualizer {
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+            height: 12px;
+            margin-top: 4px;
+        }
+
+        .p-visualizer span {
+            width: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 1px;
+            height: 20%;
+        }
+
+        .playing .p-visualizer span {
+            animation: bounce 0.8s infinite ease-in-out;
+            background: var(--text-primary);
+        }
+
+        .p-visualizer span:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .p-visualizer span:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .p-visualizer span:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                height: 20%;
+            }
+
+            50% {
+                height: 100%;
+            }
+        }
+
+        /* Background Grain Effect */
+        .bg-grain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3BaseFilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/baseFilter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-wavy"></div>
+    <div class="bg-overlay"></div>
+
+    <nav id="nav-bar">
+        <div class="nav-branding">
+            <img src="nav_logo.png" alt="Miranda" class="nav-logo">
+        </div>
+        <a href="index.html">Home</a>
+        <a href="brands.html" class="active">Brands</a>
+        <a href="https://discord.gg/uQ8cAqkU2p" target="_blank">Support</a>
+    </nav>
+
+    <div class="header-content">
+        <h2>Brands</h2>
+        <p class="description">A curated showcase of our recent projects, alongside projects we protect.</p>
+    </div>
+
+    <div class="main-showcase">
+        <div class="brands-grid">
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="tragic.png" alt="Tragic RP" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Tragic RP</div>
+                    <div class="brand-desc">unlimited aura. high stakes. don't get caught lacking.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="fivestar.jpg" alt="Five Star" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Five Star</div>
+                    <div class="brand-desc">main character energy only. the motion is crazy.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="bandup.png" alt="Bandup RP" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Bandup RP</div>
+                    <div class="brand-desc">focus on the bag. streets talk, we listen.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="charmed.png" alt="Charmed RZ" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Charmed RZ</div>
+                    <div class="brand-desc">redzone demon. strictly for the shooters.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="tokyo.png" alt="Tokyo Roleplay" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Tokyo Roleplay</div>
+                    <div class="brand-desc">neon vibes. lost in the sauce. the future is now.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="thuggin.png" alt="Thuggin RP" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Thuggin RP</div>
+                    <div class="brand-desc">active on the block. no face no case.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="shotta.png" alt="Shotta RP" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Shotta RP</div>
+                    <div class="brand-desc">heavy motion. top floor steppers only.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="rundown.png" alt="Rundown" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Rundown</div>
+                    <div class="brand-desc">high fps. no lag. just pure mechanical skill.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="riot.png" alt="Riot RP" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Riot RP</div>
+                    <div class="brand-desc">chaos is the vibe. city on lock.</div>
+                </div>
+            </a>
+
+            <a href="#" class="brand-card">
+                <div class="brand-img-box">
+                    <img src="lavish.png" alt="Lavish RP" class="brand-img">
+                </div>
+                <div class="brand-info">
+                    <div class="brand-name">Lavish RP</div>
+                    <div class="brand-desc">quiet luxury. for the ones really doing it.</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div id="player-container">
+        <div class="p-input-container" id="music-input-box">
+            <input type="text" id="yt-link-input" placeholder="Paste YouTube link and press Enter..."
+                onkeypress="handleMusicInput(event)">
+        </div>
+        <div class="player-pill" id="pill">
+            <button class="play-toggle" onclick="toggleMusic()">
+                <svg id="m-play" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                </svg>
+                <svg id="m-pause" class="hidden" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                </svg>
+            </button>
+            <div class="p-info" onclick="toggleInput()" style="cursor: pointer;">
+                <div class="p-title-wrapper">
+                    <span class="p-title" id="display-title">Lorn - Acid Rain</span>
+                </div>
+                <div class="p-visualizer">
+                    <span></span><span></span><span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- YouTube Player (Hidden but active) -->
+    <div id="yt-player" style="position: absolute; top: -1000px; left: -1000px; opacity: 0; pointer-events: none;">
+    </div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let player;
+        let playerReady = false;
+
+        function onYouTubeIframeAPIReady() {
+            const origin = window.location.protocol === 'file:' ? '' : window.location.origin;
+            player = new YT.Player('yt-player', {
+                height: '1',
+                width: '1',
+                videoId: 'n0S_InV_2oM',
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 0,
+                    'loop': 1,
+                    'playlist': 'n0S_InV_2oM',
+                    'origin': origin,
+                    'enablejsapi': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': (e) => console.error('YT Error:', e.data)
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            playerReady = true;
+            // Brands page autoplays if user already interacted on index.html
+            player.playVideo();
+        }
+
+        function onPlayerStateChange(event) {
+            const pill = document.getElementById('pill');
+            const playIcon = document.getElementById('m-play');
+            const pauseIcon = document.getElementById('m-pause');
+
+            // 1 is Playing
+            if (event.data == 1) {
+                pill.classList.add('playing');
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+            } else {
+                pill.classList.remove('playing');
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+            }
+        }
+
+        function toggleMusic() {
+            if (!playerReady) return;
+
+            const state = player.getPlayerState();
+            if (state === 1) {
+                player.pauseVideo();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function toggleInput() {
+            const box = document.getElementById('music-input-box');
+            box.style.display = box.style.display === 'block' ? 'none' : 'block';
+            if (box.style.display === 'block') {
+                document.getElementById('yt-link-input').focus();
+            }
+        }
+
+        function handleMusicInput(event) {
+            if (event.key === 'Enter') {
+                const input = document.getElementById('yt-link-input');
+                const link = input.value;
+                const videoId = extractVideoId(link);
+
+                if (videoId) {
+                    player.loadVideoById(videoId);
+                    document.getElementById('display-title').textContent = "Custom Track";
+                    input.value = '';
+                    document.getElementById('music-input-box').style.display = 'none';
+                }
+            }
+        }
+
+        function extractVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length == 11) ? match[2] : null;
+        }
+
+        // Global safety play
+        document.addEventListener('click', () => {
+            if (player && playerReady) {
+                const state = player.getPlayerState();
+                if (state !== 1 && state !== 3) {
+                    player.playVideo();
+                }
+            }
+        }, { once: false });
+    </script>
+</body>
+
+</html>

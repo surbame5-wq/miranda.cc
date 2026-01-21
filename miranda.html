@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>miranda</title>
+    <style>
+        @font-face {
+            font-family: 'VCR';
+            src: url('https://fonts.cdnfonts.com/s/15743/VCR_OSD_MONO_1.001.woff') format('woff');
+        }
+
+        :root {
+            --bg: #000;
+            --text: #fff;
+            --accent: #ff003c;
+            /* A slight glitch red/neon */
+            --glitch-speed: 0.8s;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+            /* Custom cursor feel */
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'VCR', 'Courier New', Courier, monospace;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            text-transform: lowercase;
+        }
+
+        /* CRT Scanline Effect */
+        .crt-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 2px, 3px 100%;
+            z-index: 999;
+            pointer-events: none;
+            animation: flicker 0.1s infinite;
+        }
+
+        @keyframes flicker {
+            0% {
+                opacity: 0.9;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Glitchy Static Background */
+        .static-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://media.giphy.com/media/oEI9uWUicG7vHrkshz/giphy.gif');
+            /* Static noise */
+            background-size: cover;
+            opacity: 0.05;
+            z-index: -1;
+            filter: contrast(150%) brightness(50%);
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            width: 350px;
+            opacity: 0;
+            display: none;
+        }
+
+        .container.active {
+            display: block;
+            animation: fadeIn 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Profile Image / Avatar with distortion */
+        .avatar-container {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 0%;
+            /* Grunge look often uses square/sharp edges */
+            border: 1px solid #333;
+            object-fit: cover;
+            filter: grayscale(100%) contrast(120%);
+        }
+
+        .avatar-glitch {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('avatar.png');
+            background-size: cover;
+            opacity: 0.5;
+            z-index: -1;
+            mix-blend-mode: color-dodge;
+            animation: glitch-anim var(--glitch-speed) infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0% {
+                clip-path: inset(20% 0 30% 0);
+                transform: translate(-2px, 2px);
+            }
+
+            50% {
+                clip-path: inset(10% 0 40% 0);
+                transform: translate(5px, -5px);
+            }
+
+            100% {
+                clip-path: inset(50% 0 10% 0);
+                transform: translate(-5px, 0px);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            letter-spacing: -2px;
+            font-weight: 100;
+        }
+
+        .tagline {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #1a1a1a;
+            padding-bottom: 10px;
+        }
+
+        .links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .link-item {
+            color: #ccc;
+            text-decoration: none;
+            border: 1px solid #1a1a1a;
+            padding: 12px;
+            background: rgba(10, 10, 10, 0.5);
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-item:hover {
+            border-color: #fff;
+            color: #fff;
+            background: #000;
+            transform: translateX(5px);
+        }
+
+        .link-item::before {
+            content: "> ";
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .link-item:hover::before {
+            opacity: 1;
+        }
+
+        /* Custom Cursor */
+        .cursor {
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            position: fixed;
+            pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
+        }
+
+        /* Click to Enter Overlay */
+        #entry {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            cursor: crosshair;
+        }
+
+        #entry span {
+            font-size: 0.7rem;
+            letter-spacing: 5px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.2;
+            }
+
+            50% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0.2;
+            }
+        }
+
+        .audio-player {
+            margin-top: 40px;
+            font-size: 0.7rem;
+            color: #444;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #000;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #222;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="crt-overlay"></div>
+    <div class="static-bg"></div>
+    <div class="cursor" id="cursor"></div>
+
+    <div id="entry" onclick="enter()">
+        <span>[ INITIALIZING... ]</span>
+        <p style="font-size: 0.5rem; margin-top: 10px; color: #333;">click to connect to miranda.cc</p>
+    </div>
+
+    <div class="container" id="main">
+        <div class="avatar-container">
+            <img src="avatar.png" class="avatar" alt="miranda">
+            <div class="avatar-glitch"></div>
+        </div>
+
+        <h1>miranda</h1>
+        <p class="tagline">// secure. private. anonymous.</p>
+
+        <div class="links">
+            <a href="#" class="link-item">discord</a>
+            <a href="#" class="link-item">telegram</a>
+            <a href="#" class="link-item">github</a>
+            <a href="#" class="link-item">portfolio</a>
+        </div>
+
+        <div class="audio-player">
+            <span id="track-name">now playing: [ unknown_signal.mp3 ]</span>
+        </div>
+    </div>
+
+    <audio id="music" loop>
+        <source src="https://cdn.pixabay.com/audio/2022/10/14/audio_349d97746d.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        function enter() {
+            document.getElementById('entry').style.display = 'none';
+            document.getElementById('main').classList.add('active');
+            document.getElementById('music').play();
+        }
+
+        // Random glitch effect on title
+        const h1 = document.querySelector('h1');
+        setInterval(() => {
+            if (Math.random() > 0.95) {
+                h1.style.transform = `translate(${Math.random() * 5}px, ${Math.random() * 5}px)`;
+                h1.style.color = Math.random() > 0.5 ? '#ff003c' : '#fff';
+                setTimeout(() => {
+                    h1.style.transform = 'translate(0,0)';
+                    h1.style.color = '#fff';
+                }, 50);
+            }
+        }, 100);
+    </script>
+</body>
+
+</html>
